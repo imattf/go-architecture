@@ -1,19 +1,38 @@
+// Interfaces are contracts that will implicitly garauntee any value is going to have a method
+// Interface will go find the unique implmentation on the concrete type
+
 package main
 
 import "fmt"
 
+// a concrete person type
 type person struct {
 	first string
 }
 
+// method: person speak
 func (p person) speak() {
-	fmt.Println("from a person - this is my name", p.first)
+	fmt.Println("My Person Name", p.first)
+}
+
+// another concrete parent type
+// with an abstract type of person
+type parent struct {
+	person
+	saysNo bool
+}
+
+// method: parent speak
+func (p parent) speak() {
+	fmt.Println("My Parent Name", p.first)
 }
 
 //an interfce says
 // any type that has the methods specified by an interface,
 // ...is also of the interface type
 // If you have these methods, then you are my type
+
+// an abstract human type
 type human interface {
 	speak()
 }
@@ -24,11 +43,35 @@ func main() {
 	p1 := person{
 		first: "James",
 	}
-	fmt.Printf("Here is a person type %T\n", p1)
+
+	p2 := parent{
+		person: person{
+			first: "Dad",
+		},
+		saysNo: true,
+	}
+
+	//fmt.Printf("Here is a person type %T\n", p1)
 
 	// a value can be of more than 1 type
 	// in this example, p1 is both type person and type human
-	var x human
-	x = p1
-	fmt.Printf("Here is a human type %T\n", x)
+	var x human //x is a human
+	x = p1      //is now a person too
+	x.speak()   //call human speak, which calls person speak
+
+	x = p2    //is now a parent too
+	x.speak() //call human speak, which calls parent speak
+
+	//TODO: calling a concrete method explicity thru the abstract class
+	// using .dot notation
+	p2.speak() //from human speak, calls person speak
+
 }
+
+//git status
+//git add -A
+//git commit - "added more interface"
+//git push
+//git tag or git log
+//git tag v0.0.5
+//git push --tags

@@ -1,90 +1,87 @@
 // Interfaces are contracts that will implicitly garauntee any value is going to have a method
 // Interface will go find the unique implmentation on the concrete type
+// datastore example
 
 package main
 
 import "fmt"
 
-// a concrete person type
+//datastore schema
 type person struct {
 	first string
 }
 
-// method: person speak
-func (p person) speak() {
-	fmt.Println("My Person Name", p.first)
+//mongodb stuff...
+type mongodb map[int]person
+
+func (mg mongodb) save(n int, p person) {
+	mg[n] = p
+}
+func (mg mongodb) get(n int) person {
+	return mg[n]
 }
 
-// another concrete parent type
-// with an abstract type of person
-type parent struct {
-	person
-	saysNo bool
+//postgres stuff...
+type postgres map[int]person
+
+func (pg postgres) save(n int, p person) {
+	pg[n] = p
+}
+func (pg postgres) get(n int) person {
+	return pg[n]
 }
 
-// method: parent speak
-func (p parent) speak() {
-	fmt.Println("My Parent Name", p.first)
+//datastore stuff...
+type datastore interface {
+	save(n int, p person) //pass in key & person value
+	get(n int) person     //pass in key & return a person value
 }
 
-//an interfce says
-// any type that has the methods specified by an interface,
-// ...is also of the interface type
-// If you have these methods, then you are my type
-
-// an abstract human type
-type human interface {
-	speak()
+func put(d datastore, n int, p person) {
+	d.save(n, p)
 }
-
-//now create a function
-func foo(h human) {
-	h.speak()
+func get(d datastore, n int) person {
+	return d.get(n)
 }
 
 func main() {
 
-	//a variable p1 contains a value of type person
+	//create the datastore
+	fmt.Println("Create datastore...")
+	mds := mongodb{}
+	//pds := postgres{}
+
+	//create the persons
+	fmt.Println(".start creating the data")
 	p1 := person{
-		first: "James",
+		first: "Bob",
 	}
-
-	p2 := parent{
-		person: person{
-			first: "Dad",
-		},
-		saysNo: true,
+	p2 := person{
+		first: "Terry",
 	}
+	p3 := person{
+		first: "Cathy",
+	}
+	fmt.Println("...created:", p1)
+	fmt.Println("...created:", p2)
+	fmt.Println("...created:", p3)
 
-	//fmt.Printf("Here is a person type %T\n", p1)
+	//save the persons in a mongodb datastore
+	fmt.Println(".start loading data into mongodb datastore")
+	put(mds, 1, p1)
+	put(mds, 2, p2)
+	put(mds, 3, p3)
+	fmt.Println("...storing:", p1)
+	fmt.Println("...storing:", p2)
+	fmt.Println("...storing:", p3)
 
-	// a value can be of more than 1 type
-	// in this example, p1 is both type person and type human
-	var x human //x is a human
-	x = p1      //is now a person too
-	x.speak()   //call human speak, which calls person speak
-
-	x = p2    //is now a parent too
-	x.speak() //call human speak, which calls parent speak
-
-	//substitutability...
-	fmt.Println("Substitutability...")
-	foo(x)  //explicit human interface
-	foo(p1) //concrete person type
-	foo(p2) //concrete parent type
-
-	//Calling a concrete method explicity thru the abstract class
-	// using .dot notation
-	fmt.Println(".dot notation...")
-	fmt.Println("here:", x.(parent).first)
-	x.(parent).speak() //from human speak, calls person speak
+	//get the persons from the mongodb datastore
+	fmt.Println(".start getting data from mongodb datastore")
+	rec1 := get(mds, 1)
+	rec2 := get(mds, 2)
+	rec3 := get(mds, 3)
+	fmt.Println("...getting:", rec1)
+	fmt.Println("...getting:", rec2)
+	fmt.Println("...getting:", rec3)
 
 }
-
-//git status
-//git add -A
-//git commit - "added more interface"
-//git push
-//git tag or git log
-//git tag v0.0.5
-//git push --tags

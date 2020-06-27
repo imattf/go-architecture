@@ -37,6 +37,11 @@ type human interface {
 	speak()
 }
 
+//now create a function
+func foo(h human) {
+	h.speak()
+}
+
 func main() {
 
 	//a variable p1 contains a value of type person
@@ -62,8 +67,15 @@ func main() {
 	x = p2    //is now a parent too
 	x.speak() //call human speak, which calls parent speak
 
-	//TODO: calling a concrete method explicity thru the abstract class
+	//substitutability...
+	fmt.Println("Substitutability...")
+	foo(x)  //explicit human interface
+	foo(p1) //concrete person type
+	foo(p2) //concrete parent type
+
+	//Calling a concrete method explicity thru the abstract class
 	// using .dot notation
+	fmt.Println(".dot notation...")
 	fmt.Println("here:", x.(parent).first)
 	x.(parent).speak() //from human speak, calls person speak
 

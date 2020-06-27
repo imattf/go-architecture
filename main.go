@@ -64,7 +64,8 @@ func main() {
 
 	//TODO: calling a concrete method explicity thru the abstract class
 	// using .dot notation
-	p2.speak() //from human speak, calls person speak
+	fmt.Println("here:", x.(parent).first)
+	x.(parent).speak() //from human speak, calls person speak
 
 }
 

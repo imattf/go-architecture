@@ -76,9 +76,6 @@ func main() {
 
 	//get the Persons from the postgres Datastore
 	fmt.Println(".start getting data from postgres Datastore")
-	// rec1 = get(pds, 1)
-	// rec2 = get(pds, 2)
-	// rec3 = get(pds, 3)
 	fmt.Println("...getting: 1", architecture.Get(pds, 1))
 	fmt.Println("...getting: 2", architecture.Get(pds, 2))
 	fmt.Println("...getting: 3", architecture.Get(pds, 3))

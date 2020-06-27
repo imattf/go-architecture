@@ -42,3 +42,30 @@ func ExamplePut() {
 	// Output: {Bob}
 
 }
+
+func TestGet(t *testing.T) {
+	mdb := Db{}
+	p := Person{
+		First: "Bob",
+	}
+	Put(mdb, 1, p)
+
+	got := mdb.Get(1)
+	if got != p {
+		t.Fatalf("Want %v, got %v", p, got)
+	}
+
+}
+
+func ExampleGet() {
+	mdb := Db{}
+	p := Person{
+		First: "Bob",
+	}
+	Put(mdb, 1, p)
+
+	got := mdb.Get(1)
+	fmt.Println(got)
+	// Output: {Bob}
+
+}

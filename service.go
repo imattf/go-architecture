@@ -10,8 +10,8 @@ type Person struct {
 // Datastore is how to store and get a person.
 // When getting a person, if they do not exist, return the zero value.
 type Datastore interface {
-	Save(n int, p Person) //pass in key & Person value
-	Get(n int) Person     //pass in key & return a Person value
+	Save(n int, p Person)
+	Get(n int) Person
 }
 
 // DatastoreService is wrapper service to get records from a Datastore.
@@ -36,12 +36,12 @@ func NewDatastoreService(d Datastore) DatastoreService {
 	}
 }
 
-// Store function takes a datastore, key value and a record value.
-func Store(d Datastore, n int, p Person) {
-	d.Save(n, p)
-}
-
-// Get function takes a datastore and key value and returns a record value.
+// Get function takes a Datastore and key value and returns a record value.
 func Get(d Datastore, n int) Person {
 	return d.Get(n)
+}
+
+// Put function takes a Datastore, key value and a record value.
+func Put(d Datastore, n int, p Person) {
+	d.Save(n, p)
 }

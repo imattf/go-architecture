@@ -1,34 +1,33 @@
-// Interfaces are contracts that will implicitly garauntee any value is going to have a method
-// Interface will go find the unique implmentation on the concrete type
-// Datastore example w/ refactor for DatastoreService with a get method...
-
 package architecture
 
 import "fmt"
 
-//Datastore schema
+// Person is how the architecture package stores a person
 type Person struct {
 	First string
 }
 
-//Datastore stuff...
+// Datastore is how to store and get a person
+// When getting a person, if they do not exist, return the zero value
 type Datastore interface {
 	Save(n int, p Person) //pass in key & Person value
 	Get(n int) Person     //pass in key & return a Person value
 }
 
-//wrap service around Datastore...
+// DatastoreService is wrapper service to get records from a Datastore
 type DatastoreService struct {
 	d Datastore
 }
 
+// NewDatastoreService creates a new DatastoreService
 func NewDatastoreService(d Datastore) DatastoreService {
 	return DatastoreService{
 		d: d,
 	}
 }
 
-//... with a get service
+// Get method takes a key value and returns a record value
+// If no key exists, an error is returned
 func (ds DatastoreService) Get(n int) (Person, error) {
 	p := ds.d.Get(n)
 	if p.First == "" {
@@ -37,9 +36,12 @@ func (ds DatastoreService) Get(n int) (Person, error) {
 	return p, nil
 }
 
+// Store function takes a datastore, key value and a record value
 func Store(d Datastore, n int, p Person) {
 	d.Save(n, p)
 }
+
+// Get function takes a datastore and key value and returns a record value
 func Get(d Datastore, n int) Person {
 	return d.Get(n)
 }

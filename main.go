@@ -1,4 +1,4 @@
-// Hand on Exercise 2 - Ninja Level 2
+// Hand-on Exercise 2 - Ninja Level 2
 // Recreate the database example using two maps to simulate the databases. 
 // Create an “accessor” interface that has two methods
 //  save

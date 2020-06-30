@@ -1,10 +1,18 @@
-# Setup...
+ # Hand-on Exercise 3 - Ninja Level 2
+ 
+## Make changes:
+     Organize your code to follow the proper go conventions
 
-from Documents/golearn/go211..
-```
-git clone git@github.com:imattf/golang-architecture.git
-cd golang-architecture
-git checkout v1.7.0
-git checkout -b organization
-git branch
-```
+       - cmd folder
+       - subfolder for what you want to call your executable
+       - put in here
+         - package main
+         - func main
+       - create package architecture
+       - create database implementations in separate folders
+         - mongo
+           - package mongo
+           - db.go
+         - harddrive
+           - package harddrive
+           - db.go

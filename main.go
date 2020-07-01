@@ -34,6 +34,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("file 2 size is:", n)
+	fmt.Println("file2.txt size is:", n)
 
 }

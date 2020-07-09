@@ -1,39 +1,70 @@
-// Hands-on exercise #5
-// In this exercise, copy the contents from one file to a new file.
-// Create a file “file-01.txt” from which to copy.
-// To complete this exercise, use
-//   io.Copy
-//   os.Create
-//   os.Open
+//Parent Context context.Background()
+//with a child context given a timeout value
 
 package main
 
 import (
+	"context"
 	"fmt"
-	"io"
-	"os"
+	"io/ioutil"
+	"net/http"
+	"time"
 )
+
+//takes in a context and a route to make a getRequest to and returns the body from the request back
+func makeRequest(ctx context.Context, route string) (string, error) {
+
+	//A context does have a deadline functions & weather there was a deadline
+	//Check it and pull out the deadline...
+	// if the time until the deadline is less than a certain time to be too short don't even start
+	deadline, ok := ctx.Deadline()
+	if ok && time.Until(deadline) < 100*time.Millisecond {
+		return "", fmt.Errorf("Deadline too near")
+	}
+
+	//standard library Do knows what to do with that automatically...
+	//https://pkg.go.dev/net/http?tab=doc#NewRequestWithContext
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, route, nil)
+	if err != nil {
+		return "", err
+	}
+	//https://pkg.go.dev/net/http?tab=doc#Client.Do
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("Bad status code: %d", resp.StatusCode)
+	}
+
+	bs, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return string(bs), nil
+
+}
 
 func main() {
 
-	// Open a file
-	f1, err := os.Open("file1.txt")
-	if err != nil {
-		panic(err)
-	}
-	defer f1.Close()
+	//context.Background is the base (parent) context, usually called from main
 
-	// Create a new file
-	f2, err := os.Create("file2.txt")
+	//here we add a timeout to the context
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
+	//ctx is the new derived context with a time out value
+
+	//always defer your cancel
+	defer cancel()
+
+	//so now pass this new child context into makeRequest and we'll get a timeout
+	resp, err := makeRequest(ctx, "https://google.com")
 	if err != nil {
 		panic(err)
 	}
 
-	// Copy contents from original file to new file
-	n, err := io.Copy(f2, f1)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("file2.txt size is:", n)
+	fmt.Println(resp)
 
 }

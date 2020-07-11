@@ -1,30 +1,41 @@
-//Hands-on Exercise #2 - Ninja Level 3
-// Using the code from the previous exercise
-// have each key be its own type
-// abstract all of the context code into its own
-// functions as applicable
-// package, separate from main
-// pull the values out
-// tag v1.14.0 & v1.16.0
-// video 69 Hands On 2 - Attempt 1
+// Hands-on exercise #4 - Ninja Level 3
+// create a background context
+// create a child context with a timeout
+// show the code working two ways
+// not timing out
+// timing out
+// Things that will be useful to use in this example:
+// time.Time is a specific point in time
+// time.Duration is a period of time
+// time.Millisecond
+// this is a duration
+// time.Sleep
+// takes in a duration
+// tag v1.15.0 & v1.17.0
+// video: 71 Hands On 4 - Attempt 2
 
 package main
 
 import (
 	"context"
 	"fmt"
-
-	"github.com/imattf/go-architecture/session"
+	"time"
 )
 
 func main() {
 
 	ctx := context.Background() //default parent
 
-	ctx = session.SetUserID(ctx, 42)      //go add value with child
-	ctx = session.SetUserAdmin(ctx, true) //go add value with child
-	i := session.GetUserID(ctx)           //go get context value
-	b := session.GetUserAdmin(ctx)        //go get context value
-	fmt.Printf("user %d is an admin: %t\n", i, b)
+	// this is the work
+	ctx, cancelf := context.WithTimeout(ctx, 100*time.Second)
+	defer cancelf()
 
+	time.Sleep(5 * time.Second)
+
+	select {
+	case <-ctx.Done():
+		fmt.Println("work timed-out reached")
+	default:
+		fmt.Println("work finished")
+	}
 }

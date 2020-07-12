@@ -1,64 +1,48 @@
-// Hands-on exercise #5 - Ninja Level 3
-// create a background context
-// create a child context with cancel
-// assign this to a variable “ctx”
-// launch 100 goroutines
-// give a unique number to each goroutine
-// print “running” and the number
-// have an eternal loop with
-// select
-// case <- ctx.Done():
-// return
-// default:
-// print “still working” and the number
-// sleep for a 1/10 of a second
-// show the number of goroutines running
-// after your eternal for loop
-// sleep for a bit so that all goroutines can be launched
-// call your cancel func
-// this will cancel your context, and all launched goroutines
-// sleep for a bit so that your program can close goroutines
-// show the goroutines running
-// exit main
+//Errors..
+// Using unwrap
 
 package main
 
 import (
-	"context"
+	"errors"
 	"fmt"
-	"runtime"
-	"time"
 )
 
 func main() {
+	err := foo()
+	fmt.Println(err)
 
-	fmt.Printf("Number of goroutines running: %d\n", runtime.NumGoroutine())
+	//bar error
+	baseErr := errors.Unwrap(err)
+	fmt.Println(baseErr)
 
-	ctx := context.Background() //default parent
-	ctx, cancelf := context.WithCancel(ctx)
-	defer cancelf()
+	//moo error
+	baseErr = errors.Unwrap(baseErr)
+	fmt.Println(baseErr)
 
-	for i := 0; i < 100; i++ {
-		//anonymous func
-		go func(n int) {
-			fmt.Println("launching goroutine", n)
-			for {
-				select {
-				case <-ctx.Done():
-					return
-					//runtime.Goexit()
-				default:
-					fmt.Printf("...goroutine %d is doing work\n", n)
-					time.Sleep(2 * time.Second)
-				}
-			}
-		}(i)
-	}
+	//cat error
+	baseErr = errors.Unwrap(baseErr)
+	fmt.Println(baseErr)
 
-	time.Sleep(time.Millisecond)
-	fmt.Printf("Number of goroutines running after 1 Millisecond: %d\n", runtime.NumGoroutine())
-	cancelf()
-	fmt.Println("Cancelling goroutines")
-	time.Sleep(5 * time.Second)
-	fmt.Printf("Number of goroutines running after cancelf() called: %d\n", runtime.NumGoroutine())
+	//no more errors
+	baseErr = errors.Unwrap(baseErr)
+	fmt.Println(baseErr)
+
+}
+
+func foo() error {
+	return fmt.Errorf("foo is an error: %w", bar())
+}
+
+func bar() error {
+	return fmt.Errorf("bar is an error: %w", moo())
+}
+
+func moo() error {
+	return fmt.Errorf("moo is an error: %w", cat())
+}
+
+//base error
+func cat() error {
+	return errors.New("cat is an error")
 }

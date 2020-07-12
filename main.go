@@ -1,14 +1,13 @@
-// Hands-on exercise #3 - Ninja Level 4
-// Using fmt.Errorf(), handle all errors in a program that does the following:
-// open file #1
-// create file #2
-// copy the contents of file #1 to file #2
-// tag v1.31.0
-// video: 92 Hands On 3
+// Hands-on exercise #4 - Ninja Level 4
+// Using the code in the previous example, use errors.Is() to give a special message if the file you are trying to open does not exist. Notes:
+// https://godoc.org/os#pkg-variables
+// tag 1.31.1
+// video: 93 Hands On 4
 
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -20,7 +19,9 @@ func main() {
 	src := "file1.txt"
 	dst := "file2.txt"
 	err := copyFile(dst, src)
-	if err != nil {
+	if errors.Is(err, os.ErrNotExist) {
+		fmt.Println("you need to provide valid file name of:", src)
+	} else if err != nil {
 		log.Panicln("main exception: copyFile returned an error - ", err)
 	}
 
@@ -34,8 +35,6 @@ func copyFile(dst, src string) error {
 	defer f1.Close()
 
 	f2, err := os.Create(dst)
-	//panic for the fun of it
-	log.Panic("for the fun of it")
 	if err != nil {
 		return fmt.Errorf("Can't create a file in Copyfile: %w", err)
 	}

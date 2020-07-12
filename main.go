@@ -1,37 +1,54 @@
-// Hands-on exercise #1
-// create a type
-// have it implement the error interface
-// create a value of that type
-// pass that into a function, or return it from a function, that takes type error
-// tag v1.30.0
-// video: 90 Hands On 1
+// Hands-on exercise #3 - Ninja Level 4
+// Using fmt.Errorf(), handle all errors in a program that does the following:
+// open file #1
+// create file #2
+// copy the contents of file #1 to file #2
+// tag v1.31.0
+// video: 92 Hands On 3
 
 package main
 
 import (
 	"fmt"
+	"io"
 	"log"
+	"os"
 )
 
-type errorString string
-
-func (es errorString) Error() string {
-	return fmt.Sprintf("this is an error string who,what,when,where - %s", string(es))
-}
-
 func main() {
-	n, err := sum(2, 4)
+
+	src := "file1.txt"
+	dst := "file2.txt"
+	err := copyFile(dst, src)
 	if err != nil {
-		log.Fatalln(err)
+		log.Panicln("main exception: copyFile returned an error - ", err)
 	}
-	fmt.Println(n)
+
 }
 
-func sum(i, j int) (int, error) {
-	n := i * j
-	if n != i+j {
-		var sErr errorString = "numbers don't add up"
-		return 0, sErr
+func copyFile(dst, src string) error {
+	f1, err := os.Open(src)
+	if err != nil {
+		return fmt.Errorf("Can't open file in Copyfile: %w", err)
 	}
-	return n, nil
+	defer f1.Close()
+
+	f2, err := os.Create(dst)
+	//panic for the fun of it
+	log.Panic("for the fun of it")
+	if err != nil {
+		return fmt.Errorf("Can't create a file in Copyfile: %w", err)
+	}
+	defer f2.Close()
+
+	n, err := io.Copy(f2, f1)
+	if err != nil {
+		return fmt.Errorf("Can't copy a file in Copyfile: %w", err)
+	}
+	defer f2.Close()
+
+	fmt.Println("Copy successful, bytes written:", n)
+
+	return nil
+
 }

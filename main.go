@@ -1,58 +1,115 @@
-// Hands-on exercise #5 - Ninja Level 4
-// Using the code in the previous example, use errors.As() to access *PathError and print out some fields or run some methods attached to *PathError. Notes:
-// https://godoc.org/os#Open
-// https://godoc.org/os#Create
-// https://godoc.org/os#PathError
-// tag v1.31.2
-// video: 94 Hands On 5
+// Hands-on exercise #6 - Ninja Level 4
+// Recreate the foo bar moo cat example. To do this, follow these general steps:
+// create these functions, each of which returns a value of type error
+// main calls foo
+// foo
+// foo calls bar
+// bar
+// bar calls moo
+// moo
+// moo calls cat
+// cat
+// cat calls nothing
+// include the error information from any previous calls
+// use errors.Unwrap() to access all of the individual errors
+// name the variables that hold the unwrapped error
+// fooErr
+// barErr
+// mooErr
+// catErr
+// baseErr
+// this err will be nil
+// tag v1.32.0
+// video: 95 Hands On 6
 
 package main
 
 import (
 	"errors"
 	"fmt"
-	"io"
-	"log"
-	"os"
 )
 
 func main() {
 
-	src := "file1.txt"
-	dst := "file2.txt"
-	err := copyFile(dst, src)
-	var perr *os.PathError
-	if errors.As(err, &perr) && errors.Is(err, os.ErrNotExist) {
-		fmt.Println("you need to provide valid file name of:", src)
-	} else if errors.As(err, &perr) {
-		fmt.Printf("main exception: error in copyFile: %s - OPERATION: %s - Error: %s\n", perr.Path, perr.Op, err)
-	} else if err != nil {
-		log.Panicln("main exception: copyFile returned an error - ", err)
-	}
+	//New...
+	//
+	fmt.Println("Todds...")
+	fooErr := foo()
+	barErr := errors.Unwrap(fooErr)
+	mooErr := errors.Unwrap(barErr)
+	catErr := errors.Unwrap(mooErr)
+	baseErr := errors.Unwrap(catErr)
+	fmt.Printf("fooErr\t%s\n", fooErr)
+	fmt.Printf("barErr\t%s\n", barErr)
+	fmt.Printf("mooErr\t%s\n", mooErr)
+	fmt.Printf("catErr\t%s\n", catErr)
+	fmt.Printf("baseErr\t%v\n", baseErr)
+
+	//Mine...
+	//
+	fmt.Println("Mine...")
+
+	//foo error
+	fooErr = foo()
+	fmt.Println("foo error: ", fooErr)
+
+	//bar error
+	barErr = errors.Unwrap(fooErr)
+	fmt.Println("bar error: ", barErr)
+
+	//moo error
+	mooErr = errors.Unwrap(barErr)
+	fmt.Println("moo error: ", mooErr)
+
+	//cat error
+	catErr = errors.Unwrap(mooErr)
+	fmt.Println("cat error: ", catErr)
+
+	//no more errors
+	baseErr = errors.Unwrap(catErr)
+	fmt.Println("base error: ", baseErr)
+
+	//Orig...
+	//
+	fmt.Println("Orig...")
+	//foo error
+	err := foo()
+	fmt.Println(err)
+
+	//bar error
+	baseErr = errors.Unwrap(err)
+	fmt.Println(baseErr)
+
+	//moo error
+	baseErr = errors.Unwrap(baseErr)
+	fmt.Println(baseErr)
+
+	//cat error
+	baseErr = errors.Unwrap(baseErr)
+	fmt.Println(baseErr)
+
+	//no more errors
+	baseErr = errors.Unwrap(baseErr)
+	fmt.Println(baseErr)
 
 }
 
-func copyFile(dst, src string) error {
-	f1, err := os.Open(src)
-	if err != nil {
-		return fmt.Errorf("Can't open file in Copyfile: %w", err)
-	}
-	defer f1.Close()
+func foo() error {
+	//call bar() before returning
+	return fmt.Errorf("foo is an error: %w", bar())
+}
 
-	f2, err := os.Create(dst)
-	if err != nil {
-		return fmt.Errorf("Can't create a file in Copyfile: %w", err)
-	}
-	defer f2.Close()
+func bar() error {
+	//call moo() before returning
+	return fmt.Errorf("bar is an error: %w", moo())
+}
 
-	n, err := io.Copy(f2, f1)
-	if err != nil {
-		return fmt.Errorf("Can't copy a file in Copyfile: %w", err)
-	}
-	defer f2.Close()
+func moo() error {
+	//call cat before returning
+	return fmt.Errorf("moo is an error: %w", cat())
+}
 
-	fmt.Println("Copy successful, bytes written:", n)
-
-	return nil
-
+func cat() error {
+	//create the base error
+	return errors.New("cat is an error")
 }

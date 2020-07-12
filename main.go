@@ -1,48 +1,37 @@
-//Errors..
-// Using unwrap
+// Hands-on exercise #1
+// create a type
+// have it implement the error interface
+// create a value of that type
+// pass that into a function, or return it from a function, that takes type error
+// tag v1.30.0
+// video: 90 Hands On 1
 
 package main
 
 import (
-	"errors"
 	"fmt"
+	"log"
 )
 
+type errorString string
+
+func (es errorString) Error() string {
+	return fmt.Sprintf("this is an error string who,what,when,where - %s", string(es))
+}
+
 func main() {
-	err := foo()
-	fmt.Println(err)
-
-	//bar error
-	baseErr := errors.Unwrap(err)
-	fmt.Println(baseErr)
-
-	//moo error
-	baseErr = errors.Unwrap(baseErr)
-	fmt.Println(baseErr)
-
-	//cat error
-	baseErr = errors.Unwrap(baseErr)
-	fmt.Println(baseErr)
-
-	//no more errors
-	baseErr = errors.Unwrap(baseErr)
-	fmt.Println(baseErr)
-
+	n, err := sum(2, 4)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Println(n)
 }
 
-func foo() error {
-	return fmt.Errorf("foo is an error: %w", bar())
-}
-
-func bar() error {
-	return fmt.Errorf("bar is an error: %w", moo())
-}
-
-func moo() error {
-	return fmt.Errorf("moo is an error: %w", cat())
-}
-
-//base error
-func cat() error {
-	return errors.New("cat is an error")
+func sum(i, j int) (int, error) {
+	n := i * j
+	if n != i+j {
+		var sErr errorString = "numbers don't add up"
+		return 0, sErr
+	}
+	return n, nil
 }

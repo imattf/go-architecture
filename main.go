@@ -1,44 +1,31 @@
-// Stringer
-// overriding the Println function for a struct type
-// using the String() method
-// see fmt.Stringer https://github.com/golang/go/blob/go1.14.4/src/fmt/print.go#L62
+// Stack, Heap and Escape Analysis
+// with go run -gcflags "-m" main.go
 
 package main
 
-import "fmt"
+//go:noinline
 
-type person struct {
-	first string
+func foo() int {
+	x := 42
+	return x
 }
 
-//If you have the String() method, Println will use this to print out values
-func (p person) String() string {
-	return fmt.Sprintf("My name is %s", p.first)
-}
-
-// Animal has a Name and an Age to represent an animal.
-type Animal struct {
-	Name string
-	Age  uint
-}
-
-// String makes Animal satisfy the Stringer interface.
-func (a Animal) String() string {
-	return fmt.Sprintf("%v (%d)", a.Name, a.Age)
+//go:noinline
+func bar() *int {
+	y := 21
+	return &y
 }
 
 func main() {
-	p1 := person{
-		first: "Jenny",
-	}
 
-	fmt.Println(p1)
-
-	a := Animal{
-		Name: "Gopher",
-		Age:  2,
-	}
-	fmt.Println(a)
-	// Output: Gopher (2)
+	//prevent Go complier from optimizing the code here
+	_ = foo() //on return gets removed from stack
+	_ = bar() //on return y gets copied to heap
 
 }
+
+// result:
+// go-architecture % go run -gcflags "-m" main.go
+// # command-line-arguments
+// ./main.go:14:2: moved to heap: y
+// go-architecture %
